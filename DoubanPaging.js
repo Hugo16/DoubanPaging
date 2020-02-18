@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         豆瓣电影列表翻页
-// @namespace    http://tampermonkey.net/
-// @version      0.1
+// @namespace    https://greasyfork.org/zh-CN/scripts/396471-%E8%B1%86%E7%93%A3%E7%94%B5%E5%BD%B1%E5%88%97%E8%A1%A8%E7%BF%BB%E9%A1%B5
+// @version      0.11
 // @description  增加自动加载和翻页功能
 // @author       Hugo16
 // @match        https://movie.douban.com/explore
@@ -50,14 +50,14 @@
     btn1.on('click', function () {
         if (config == 0) return;
         document.cookie = 'dbMode=0';
-        window.location.reload()
+        window.location.reload();
     });
 
     // 自动加载
     btn2.on('click', function () {
         if (config == 1) return;
         document.cookie = 'dbMode=1';
-        window.location.reload()
+        window.location.reload();
     });
 
     // 翻页模式
@@ -96,7 +96,7 @@ function pageMode(url) {
         pageStart = 0;
         pageIndex = 1;
         $(".article .tags").on("click", function () {
-            window.reload();
+            window.location.reload();
         })
     }
     // 添加按键
@@ -178,7 +178,7 @@ function getDataByPageIndex(index, limit, url) {
             url.url = url.url.replace(/start=\d+/, 'start=' + ((index - 1) * 20 + 1));
         }
         else {
-            url.url = 'https://movie.douban.com/j/new_search_subjects?sort=U&range=0,10&tags=&start=21';
+            url.url = 'https://movie.douban.com/j/new_search_subjects?start=0&' + window.location.href.split('?')[1];
         }
     }
     let res = $.ajax({ url: url.url, async: false });
@@ -191,8 +191,11 @@ function getDataByPageIndex(index, limit, url) {
     }
 
     // 清空容器并填充新的数据
-    $('div.list-wp div.list').empty();
-    $('div.article div.list-wp').empty();
+    if (window.location.href.indexOf('explore') >= 0) {
+        $('div.list-wp div.list').empty();
+    } else {
+        $('div.article div.list-wp').empty();
+    }
     for (let i = 0; i < data.length; i++) {
         if (window.location.href.indexOf('explore') >= 0) {
             let newItem = $('<a class="item" target="_blank" href="' + data[i].url
